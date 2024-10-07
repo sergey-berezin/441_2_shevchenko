@@ -14,22 +14,22 @@ namespace EvolutionaryAlgorithm
     public class Individual
     {
         public List<Square> Squares { get; set; }
-        public int Fitness { get; set; }
+        public int Loss { get; set; }
 
         public Individual(List<Square> squares)
         {
             Squares = squares;
-            CalculateFitness();
+            CalculateLoss();
         }
 
-        private void CalculateFitness()
+        private void CalculateLoss()
         {
             int minX = Squares.Min(s => s.X);
             int minY = Squares.Min(s => s.Y);
             int maxX = Squares.Max(s => s.X + s.Side);
             int maxY = Squares.Max(s => s.Y + s.Side);
 
-            Fitness = (maxX - minX) * (maxY - minY);
+            Loss = (maxX - minX) * (maxY - minY);
 
             foreach (var square in Squares)
             {
@@ -37,7 +37,7 @@ namespace EvolutionaryAlgorithm
                 {
                     if (square != otherSquare && DoSquaresIntersect(square, otherSquare))
                     {
-                        Fitness = int.MaxValue;
+                        Loss = int.MaxValue;
                         return;
                     }
                 }
@@ -136,17 +136,21 @@ namespace EvolutionaryAlgorithm
         private void Mutate(int individual)
         {
             int squareIndex = _random.Next(0, _population[individual].Squares.Count);
+            int totalArea = _population[individual].Squares.Sum(s =>s.Side * s.Side);
 
-            _population[individual].Squares[squareIndex].X = _random.Next(-10, 10);
-            _population[individual].Squares[squareIndex].Y = _random.Next(-10, 10);
+            int maxX = (int)Math.Sqrt(totalArea) * 2;
+            int maxY = maxX;
+
+            _population[individual].Squares[squareIndex].X = _random.Next(-maxX, maxX);
+            _population[individual].Squares[squareIndex].Y = _random.Next(-maxY, maxY);
         }
 
         private void GetBestIndividual() {
-            _population = _population.OrderBy(i => i.Fitness).Take(_populationSize).ToList();
+            _population = _population.OrderBy(i => i.Loss).Take(_populationSize).ToList();
         }
 
         public void PrintIterationInfo() {
-            Console.WriteLine(string.Format("Iteration {0}: Area {1}", _evolutionIter, _population[0].Fitness));
+            Console.WriteLine(string.Format("Iteration {0}: Area {1}", _evolutionIter, _population[0].Loss));
         }
     }
 }
