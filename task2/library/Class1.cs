@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EvolutionaryAlgorithm
 {
@@ -22,7 +23,7 @@ namespace EvolutionaryAlgorithm
             CalculateLoss();
         }
 
-        private void CalculateLoss()
+        public void CalculateLoss()
         {
             int minX = Squares.Min(s => s.X);
             int minY = Squares.Min(s => s.Y);
@@ -30,26 +31,33 @@ namespace EvolutionaryAlgorithm
             int maxY = Squares.Max(s => s.Y + s.Side);
 
             Loss = (maxX - minX) * (maxY - minY);
+        }
 
+        public bool IsPositionValid() {
             foreach (var square in Squares)
             {
                 foreach (var otherSquare in Squares)
                 {
-                    if (square != otherSquare && DoSquaresIntersect(square, otherSquare))
+                    if (square != otherSquare && (IsSquaresIntersect(square, otherSquare)  || IsSquareUnbounding(square)))
                     {
-                        Loss = int.MaxValue;
-                        return;
+                        return false;
                     }
                 }
             }
+
+            return true;
         }
 
-        private bool DoSquaresIntersect(Square square1, Square square2)
+        private bool IsSquaresIntersect(Square square1, Square square2)
         {
             return square1.X < square2.X + square2.Side &&
                    square2.X < square1.X + square1.Side &&
                    square1.Y < square2.Y + square2.Side &&
                    square2.Y < square1.Y + square1.Side;
+        }
+
+        private bool IsSquareUnbounding(Square square) {
+            return square.X + square.Side > 100 || square.Y + square.Side > 100;
         }
     }
 
@@ -60,89 +68,105 @@ namespace EvolutionaryAlgorithm
         private int _populationSize;
         private int _numSquares;
         private int[] _sideLengths;
+        private double _mutationProbability;
         public int _evolutionIter; 
 
-        public GeneticAlgorithm(int populationSize, int[] sideLengths)
+        public GeneticAlgorithm(int[] sideLengths, int populationSize, double mutationProbability)
         {
             _populationSize = populationSize;
             _sideLengths = sideLengths;
             _numSquares = sideLengths.Length;
+            _mutationProbability = mutationProbability;
             _evolutionIter = 0;
             _population = InitializePopulation();
             GetBestIndividual();
-        }
-
-        public void Run()
-        {
-            Evolve();
         }
 
         private List<Individual> InitializePopulation()
         {
             List<Individual> population = new List<Individual>();
 
-            for (int i = 0; i < _populationSize; i++)
+            Parallel.For(0, _populationSize, i =>
             {
-                List<Square> squares = new List<Square>();
-
-                for (int j = 0; j < _numSquares; j++)
+                Individual individual;
+                do 
                 {
-                    int side = _sideLengths[j];
-                    int x = _random.Next(0, 100);
-                    int y = _random.Next(0, 100);
+                    List<Square> squares = new List<Square>();
 
-                    squares.Add(new Square { Side = side, X = x, Y = y });
+                    for (int j = 0; j < _numSquares; j++)
+                    {
+                        int side = _sideLengths[j];
+                        int x = _random.Next(0, 100);
+                        int y = _random.Next(0, 100);
+
+                        squares.Add(new Square { Side = side, X = x, Y = y });
+                    }
+
+                    individual = new Individual(squares);
+                } while (!individual.IsPositionValid());
+
+                lock (population)
+                {
+                    population.Add(individual);
                 }
-
-                population.Add(new Individual(squares));
-            }
+            });
 
             return population;
         }
 
-        private void Evolve ()
+        public void Evolve ()
         {
-            for (int i = 0; i < _populationSize; i++)
+            Parallel.For(0, _populationSize, i =>
             {
-                Mutate(i);
-                Crossover(i, _random.Next(0, _populationSize));
-            }
+                Individual child;
+                do 
+                {
+                    child = Mutate(Crossover(i, _random.Next(0, _populationSize)));
+                } while (!child.IsPositionValid());
+
+                lock (_population)
+                {
+                    _population.Add(child);
+                }
+            });
 
             GetBestIndividual();
             _evolutionIter++;
         }
-
-        private void Crossover(int parent1, int parent2)
+        
+        private Individual Crossover(int parent1, int parent2)
         {
-            List<Square> childSquares = new List<Square>();
+            List<Square> squares = new List<Square>();
 
             for (int i = 0; i < _numSquares; i++)
             {
-
                 if (_random.NextDouble() < 0.5)
                 {
-                    childSquares.Add(_population[parent1].Squares[i]);
+                    squares.Add(_population[parent1].Squares[i]);
                 }
                 else
                 {
-                    childSquares.Add(_population[parent2].Squares[i]);
+                    squares.Add(_population[parent2].Squares[i]);
                 }
-
             }
 
-            _population.Add(new Individual(childSquares));
+            return new Individual(squares);
         }
 
-        private void Mutate(int individual)
+        private Individual Mutate(Individual individual)
         {
-            int squareIndex = _random.Next(0, _population[individual].Squares.Count);
-            int totalArea = _population[individual].Squares.Sum(s =>s.Side * s.Side);
+            int maxCoordinate = (int)Math.Sqrt(individual.Squares.Sum(s => s.Side * s.Side));
 
-            int maxX = (int)Math.Sqrt(totalArea) * 2;
-            int maxY = maxX;
+            foreach (Square square in individual.Squares)
+            {
+                if (_random.NextDouble() < _mutationProbability)
+                {
+                    square.X += _random.Next(0, 1);
+                    square.Y += _random.Next(0, 1);
+                }
+            }
 
-            _population[individual].Squares[squareIndex].X = _random.Next(0, maxX);
-            _population[individual].Squares[squareIndex].Y = _random.Next(0, maxY);
+            return individual;
         }
 
         private void GetBestIndividual() {

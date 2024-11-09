@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 using EvolutionaryAlgorithm;
 
 /// <summary>
@@ -20,9 +21,12 @@ namespace application {
         private Random random = new Random();
         public int[] rectQuantities = new int[5];
         int[] rectSizes = new int[0];
+        int populationSize = 100;
+
+        double mutationProbability = 0.5;
         Brush[] rectColors = new Brush[0];
         int totalQuantity = 0;
-        public double scale = 10;
+        public double scale = 8;
         public bool findingSolution = false;
         
         public MainWindow()
@@ -52,6 +56,9 @@ namespace application {
                     index++;
                 }
             }
+
+            populationSize = int.TryParse(population_size.Text, out var population) ? population : 100;
+            mutationProbability = double.TryParse(mutation_probability.Text, out var probability) ? probability : 0.5;
         }
 
         private TextBox GetSizeTextBox(int index)
@@ -88,16 +95,25 @@ namespace application {
 
         private void DrawSquare(double x, double y, double side, Brush fill)
         {
+            double scaledX = x * scale;
+            double scaledY = y * scale;
+            double scaledSide = side * scale;
+
+            if (x < 0 || y < 0 || scaledX + scaledSide > canvas.ActualWidth || scaledY + scaledSide > canvas.ActualHeight)
+            {
+                return;
+            }
+
             Rectangle square = new Rectangle
             {
-                Width = side * scale,
-                Height = side * scale,
+                Width = scaledSide,
+                Height = scaledSide,
                 Stroke = Brushes.Black,
                 Fill = fill
             };
 
-            Canvas.SetLeft(square, x * scale);
-            Canvas.SetTop(square, y * scale);
+            Canvas.SetLeft(square, scaledX);
+            Canvas.SetTop(square, scaledY);
 
             canvas.Children.Add(square);
         }
@@ -114,6 +130,8 @@ namespace application {
             rect_quantity_3.Text = string.Empty;
             rect_quantity_4.Text = string.Empty;
             rect_quantity_5.Text = string.Empty;
+            population_size.Text = string.Empty;
+            mutation_probability.Text = string.Empty;
 
             StopFindingSolution(sender, e);
 
@@ -125,19 +143,19 @@ namespace application {
             InitializeObjectsData();
             
             if (totalQuantity > 0) {
-                var geneticAlgorithm = new GeneticAlgorithm(20, rectSizes);
+                var geneticAlgorithm = new GeneticAlgorithm(rectSizes, populationSize, mutationProbability);
             
                 findingSolution = true;
 
                 while (findingSolution)
                 {
                     int index = 0;
-                    geneticAlgorithm.Run();
+                    geneticAlgorithm.Evolve();
                     canvas.Children.Clear();
 
                     foreach (var item in geneticAlgorithm._population[0].Squares)
                     {
-                        DrawSquare(item.X, item.Y, item.Side, rectColors[index]);
+                        DrawSquare(item.X, item.Y, item.Side, rectColors[index]);                            
                         index++;
                     }
 
@@ -151,11 +169,6 @@ namespace application {
 
         private void StopFindingSolution(object sender, RoutedEventArgs e)
         {
-            // if (cancellationTokenSource != null)
-            // {
-            //     cancellationTokenSource.Cancel();
-            // }
-
             findingSolution = false;
         }
     }

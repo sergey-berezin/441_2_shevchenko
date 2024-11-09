@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:application"
         mc:Ignorable="d"
-        Title="MainWindow" Height="680" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="1200" MinHeight="680" MaxWidth="1200" MaxHeight="680">
+        Title="task2" Height="680" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="1200" MinHeight="680" MaxWidth="1200" MaxHeight="680">
     <Grid Background="#FF303030">
         <Grid.RowDefinitions>
             <RowDefinition Height="7*"/>
@@ -23,6 +23,8 @@
         <Label Content="Object 3" HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top" Width="64" Height="26" Foreground="White"/>
         <Label Content="Object 4" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top" Width="64" Height="26" Foreground="White"/>
         <Label Content="Object 5" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" Width="64" Height="26" Foreground="White"/>
+        <Label Content="Population size" HorizontalAlignment="Left" Margin="10,214,0,0" VerticalAlignment="Top" Width="128" Height="26" Foreground="White"/>
+        <Label Content="Mutation probability" HorizontalAlignment="Left" Margin="10,252,0,0" VerticalAlignment="Top" Width="128" Height="26" Foreground="White"/>
         <TextBox x:Name="rect_size_1" HorizontalAlignment="Left" Height="26" Margin="89,36,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
         <TextBox x:Name="rect_size_2" HorizontalAlignment="Left" Height="26" Margin="89,67,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
         <TextBox x:Name="rect_size_3" HorizontalAlignment="Left" Height="26" Margin="89,98,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
@@ -33,7 +35,9 @@
         <TextBox x:Name="rect_quantity_3" HorizontalAlignment="Left" Height="26" Margin="195,98,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
         <TextBox x:Name="rect_quantity_4" HorizontalAlignment="Left" Height="26" Margin="195,129,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
         <TextBox x:Name="rect_quantity_5" HorizontalAlignment="Left" Height="26" Margin="195,160,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="2" VerticalContentAlignment="Center"/>
-        <Button x:Name="clear_button" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="207,205,0,0" Width="64" Click="ClearObjectsData" Height="26" Background="#FFB7B7B7" BorderBrush="#FFD1D1D1"/>
+        <TextBox x:Name="population_size" Text="100" HorizontalAlignment="Left" Height="26" Margin="195,214,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="10" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="mutation_probability" Text="0.5" HorizontalAlignment="Left" Height="26" Margin="195,252,0,0" VerticalAlignment="Top" Width="76" MaxLines="1" MaxLength="4" VerticalContentAlignment="Center"/>
+        <Button x:Name="clear_button" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="207,296,0,0" Width="64" Click="ClearObjectsData" Height="26" Background="#FFB7B7B7" BorderBrush="#FFD1D1D1"/>
 
         <Button x:Name="start_button" Content="Start" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0" Width="64" Click="StartFindingSolution" Height="26" BorderBrush="#FFD1D1D1" Background="#FF1CCC39" Grid.Column="1"/>
         <Button x:Name="stop_button" Content="Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="76,10,0,0" Width="64" Click="StopFindingSolution" Height="26" BorderBrush="#FFD1D1D1" Background="#FFE80000" Grid.Column="1"/>
