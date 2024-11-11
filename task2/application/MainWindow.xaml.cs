@@ -28,6 +28,8 @@ namespace application {
         int totalQuantity = 0;
         public double scale = 8;
         public bool findingSolution = false;
+
+        private CancellationTokenSource cancellationTokenSource;
         
         public MainWindow()
         {
@@ -146,30 +148,37 @@ namespace application {
                 var geneticAlgorithm = new GeneticAlgorithm(rectSizes, populationSize, mutationProbability);
             
                 findingSolution = true;
+                cancellationTokenSource = new CancellationTokenSource();
 
-                while (findingSolution)
+                await Task.Factory.StartNew(() =>
                 {
-                    int index = 0;
-                    geneticAlgorithm.Evolve();
-                    canvas.Children.Clear();
-
-                    foreach (var item in geneticAlgorithm._population[0].Squares)
+                    while (findingSolution && !cancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        DrawSquare(item.X, item.Y, item.Side, rectColors[index]);                            
-                        index++;
+                        int index = 0;
+                        geneticAlgorithm.Evolve();
+        
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            canvas.Children.Clear();
+                            foreach (var item in geneticAlgorithm._population[0].Squares)
+                            {
+                                DrawSquare(item.X, item.Y, item.Side, rectColors[index]);                            
+                                index++;
+                            }
+        
+                            OutputBestMetric(geneticAlgorithm._population[0].Loss);
+                            OutputAlgorithmProgress(geneticAlgorithm._evolutionIter);
+                        });
                     }
-
-                    OutputBestMetric(geneticAlgorithm._population[0].Loss);
-                    OutputAlgorithmProgress(geneticAlgorithm._evolutionIter);
-
-                    await Task.Delay(500);
-                }
+                }, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }   
         }
 
         private void StopFindingSolution(object sender, RoutedEventArgs e)
         {
             findingSolution = false;
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
         }
     }
 }
