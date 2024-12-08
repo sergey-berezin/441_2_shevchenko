@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:application"
         mc:Ignorable="d"
-        Title="task2" Height="680" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="1200" MinHeight="680" MaxWidth="1200" MaxHeight="680">
+        Title="task3" Height="680" Width="1200" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="1200" MinHeight="680" MaxWidth="1200" MaxHeight="680">
     <Grid Background="#FF303030">
         <Grid.RowDefinitions>
             <RowDefinition Height="7*"/>
@@ -15,14 +15,6 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-
-        <!-- <StackPanel>
-            <TextBox x:Name="experimentName" Width="200"/>
-            <Button Content="Сохранить эксперимент" Click="SaveExperiment" />
-        
-            <ComboBox x:Name="experimentList" Width="200" />
-            <Button Content="Загрузить эксперимент" Click="LoadExperiment" />   
-        </StackPanel> -->
 
         <Label Content="Size" HorizontalAlignment="Left" Margin="89,10,0,0" VerticalAlignment="Top" Width="76" Height="26" Foreground="White"/>
         <Label Content="Quantity" HorizontalAlignment="Left" Margin="195,10,0,0" VerticalAlignment="Top" Width="76" Height="26" Foreground="White"/>
