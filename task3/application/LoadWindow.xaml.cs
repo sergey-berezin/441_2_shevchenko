@@ -7,7 +7,7 @@ using System.Windows;
 namespace application {
     public partial class LoadWindow : Window
     {
-        public int ExperimentIndex { get; set; }
+        public string ExperimentName { get; set; }
 
         public LoadWindow(List<string> Experiments) {
             InitializeComponent();
@@ -17,7 +17,7 @@ namespace application {
 
         private void LoadExperiment(object sender, RoutedEventArgs e) {
             if (experiments_list_box.SelectedItem != null) {
-                ExperimentIndex = experiments_list_box.SelectedIndex;
+                ExperimentName = experiments_list_box.SelectedItem.ToString();
                 DialogResult = true;
                 Close();
             }

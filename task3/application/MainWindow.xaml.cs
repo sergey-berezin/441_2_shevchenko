@@ -205,7 +205,7 @@ namespace application {
                     var loadWindow = new LoadWindow(context.Experiments.Select(exp => exp.Name).ToList());
 
                     if (loadWindow.ShowDialog() == true) {
-                        var experiment = (context.Experiments.ToArray())[loadWindow.ExperimentIndex];
+                        var experiment = context.Experiments.SingleOrDefault(exp => exp.Name == loadWindow.ExperimentName);
                         var rects = context.Rects.Where(rect => rect.ExperimentId == experiment.Id).ToArray();
                         var individuals = context.Individuals.Where(ind => ind.ExperimentId == experiment.Id).ToArray();
 
